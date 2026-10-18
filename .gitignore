@@ -20,6 +20,9 @@ data/faiss/*
 !data/temp/.gitkeep
 !data/faiss/.gitkeep
 
+# Generated embedding cache (rebuild with app/processing/pipeline.py)
+embeddings.csv
+
 # IDE / OS
 .idea/
 .vscode/
