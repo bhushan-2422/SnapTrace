@@ -14,7 +14,8 @@ retina-face==0.0.19
 tensorflow==2.21.0
 tf-keras==2.21.0
 numpy==2.5.3
-opencv-python-headless==5.0.0.93
+# contrib-headless: deepface and retina-face both declare this exact wheel.
+opencv-contrib-python-headless==5.0.0.93
 scikit-image==0.26.0
 scikit-learn==1.9.1
 pandas==3.0.6
