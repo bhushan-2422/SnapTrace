@@ -1,0 +1,16 @@
+# --- Core backend (data layer phase) ---
+fastapi>=0.110
+uvicorn[standard]>=0.29
+SQLAlchemy>=2.0
+psycopg2-binary>=2.9
+pydantic[email]>=2.6
+python-dotenv>=1.0
+
+# --- Later phases (append as implemented) ---
+# redis
+# boto3
+# faiss-cpu
+# insightface / onnxruntime   (RetinaFace + ArcFace)
+# gfpgan
+# opencv-python-headless
+# pytest
