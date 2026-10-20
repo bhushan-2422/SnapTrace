@@ -6,9 +6,10 @@ tables.  Contains no ML code and no business logic.
 
 from __future__ import annotations
 
+import json
 from collections.abc import Sequence
 
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.orm import Session, joinedload
 
 from app.models.face import Face
@@ -88,3 +89,48 @@ class FaceRepository:
             return {}
         stmt = select(Face.id, Face.image_id).where(Face.id.in_(list(face_ids)))
         return {int(face_id): int(image_id) for face_id, image_id in self.db.execute(stmt).all()}
+
+    # -- similarity search ------------------------------------------------
+
+    def search_similar(
+        self,
+        event_id: int,
+        query_embedding: list[float],
+        *,
+        threshold: float,
+        limit: int,
+        model_name: str,
+    ) -> list[tuple[int, int, float]]:
+        """Ranked (face_id, image_id, score) for one event, best first.
+
+        score is the cosine similarity in [-1, 1]: pgvector's `<=>`
+        returns the cosine *distance* and is magnitude-invariant, so the
+        raw ArcFace vectors need no pre-normalisation.  The query never
+        leaves the selected event (WHERE event_id = ...).
+        """
+        stmt = text(
+            """
+            SELECT f.id      AS face_id,
+                   i.id      AS image_id,
+                   1 - (fe.embedding <=> CAST(:query AS vector)) AS score
+            FROM face_embeddings fe
+            JOIN faces  f ON f.id = fe.face_id
+            JOIN images i ON i.id = f.image_id
+            WHERE i.event_id = :event_id
+              AND fe.model_name = :model_name
+              AND 1 - (fe.embedding <=> CAST(:query AS vector)) >= :threshold
+            ORDER BY fe.embedding <=> CAST(:query AS vector)
+            LIMIT :limit
+            """
+        )
+        rows = self.db.execute(
+            stmt,
+            {
+                "query": json.dumps([float(v) for v in query_embedding]),
+                "event_id": event_id,
+                "model_name": model_name,
+                "threshold": threshold,
+                "limit": limit,
+            },
+        ).all()
+        return [(int(face_id), int(image_id), float(score)) for face_id, image_id, score in rows]

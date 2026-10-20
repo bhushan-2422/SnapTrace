@@ -10,8 +10,13 @@ from __future__ import annotations
 import os
 from datetime import datetime, timezone
 
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase
+
+# Read .env here too, so standalone entry points (scripts, workers) get the
+# same configuration as the API.  Existing environment variables still win.
+load_dotenv()
 
 # Default matches the docker-compose PostgreSQL service (db/user/pass/db name),
 # so a local dev setup works without extra configuration.

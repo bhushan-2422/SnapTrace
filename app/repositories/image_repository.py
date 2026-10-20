@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -19,6 +21,13 @@ class ImageRepository:
 
     def get_by_id(self, image_id: int) -> Image | None:
         return self.db.get(Image, image_id)
+
+    def get_by_ids(self, image_ids: Sequence[int]) -> dict[int, Image]:
+        """Fetch a result set in one query (search results, no N+1)."""
+        if not image_ids:
+            return {}
+        stmt = select(Image).where(Image.id.in_(list(image_ids)))
+        return {image.id: image for image in self.db.scalars(stmt).all()}
 
     def list_by_event(
         self,

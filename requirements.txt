@@ -5,7 +5,12 @@ SQLAlchemy>=2.0
 psycopg2-binary>=2.9
 pydantic[email]>=2.6
 python-dotenv>=1.0
+python-multipart>=0.0.9
 pgvector>=0.3
+PyJWT>=2.8
+bcrypt>=4.1
+redis>=5.0
+boto3>=1.34
 
 # --- Computer vision (pinned: these versions define the embedding space) ---
 # Changing any of these can silently invalidate every stored embedding.
@@ -21,8 +26,4 @@ scikit-learn==1.9.1
 pandas==3.0.6
 
 # --- Later phases (append as implemented) ---
-# redis
-# boto3
-# faiss-cpu
-# gfpgan
 # pytest

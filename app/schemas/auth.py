@@ -28,6 +28,17 @@ class Token(BaseModel):
     token_type: str = "bearer"
 
 
+class TokenPairResponse(BaseModel):
+    """Returned by register/login/refresh: the client keeps the access
+    token for API calls and uses the refresh token only against
+    POST /auth/refresh."""
+
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+    expires_in: int = Field(description="Access token lifetime in seconds.")
+
+
 class TokenData(BaseModel):
     """Claims decoded from a verified token (set by the auth dependency)."""
 
